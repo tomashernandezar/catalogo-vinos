@@ -97,7 +97,11 @@
   async function crearBotella(motor, v){
     const F = FORMAS[(v.forma_botella || "").toLowerCase()] || FORMAS.bordelesa;
     const grp = new THREE.Group();
-    const perfil = F.perfil.map(p => new THREE.Vector2(p[0], p[1]));
+    // Perfil suavizado: curva continua por hombros y cuello, con fondo hundido (picada) como una botella real
+    const P = F.perfil, curva = new THREE.CatmullRomCurve3(P.slice(2, -3).map(p => new THREE.Vector3(p[0], p[1], 0)), false, "centripetal");
+    const perfil = [new THREE.Vector2(0, 0.09), new THREE.Vector2(P[1][0] * 0.45, 0.05), new THREE.Vector2(P[1][0] * 0.8, 0.004), new THREE.Vector2(P[1][0], 0),
+      ...curva.getPoints(220).map(p => new THREE.Vector2(Math.min(p.x, F.radio), p.y)),
+      ...P.slice(-3).map(p => new THREE.Vector2(p[0], p[1]))];
     // Vino: un volumen interior, apenas más chico que el vidrio, hasta el nivel de llenado
     const rEn = y => { for (let i = 1; i < F.perfil.length; i++){ const [r0, y0] = F.perfil[i - 1], [r1, y1] = F.perfil[i];
       if (y >= y0 && y <= y1 && y1 > y0) return r0 + (r1 - r0) * (y - y0) / (y1 - y0); } return 0; };
@@ -115,7 +119,7 @@
     // Vidrio: transparente pero con todos sus reflejos
     // Vidrio oscuro (tintos, espumantes) deja pasar menos luz que el transparente
     const cVidrio = lin(v.color_vidrio || "#2c3a26"), oscuro = cVidrio.getHSL({}).l < 0.2;
-    const vidrio = new THREE.Mesh(new THREE.LatheGeometry(perfil, 128),
+    const vidrio = new THREE.Mesh(new THREE.LatheGeometry(perfil, 192),
       new THREE.MeshPhysicalMaterial({ color: cVidrio, roughness: 0.04, metalness: 0, transmission: oscuro ? 0.45 : 0.9,
         transparent: true, clearcoat: 1, clearcoatRoughness: 0.03, reflectivity: 0.6, envMapIntensity: 1.8, depthWrite: false }));
     vidrio.renderOrder = 3;
@@ -140,9 +144,12 @@
     const contra = v.foto_contra ? await cargarImagen(v.foto_contra) : null;
     if (contra) pegar(contra, parseFloat(v.contra_alto) || F.etiqueta.alto * 0.85, parseFloat(v.contra_centro) || centro, Math.PI, 2 * Math.PI - arco - 0.12);
 
-    const capsula = new THREE.Mesh(new THREE.CylinderGeometry(F.cuello + 0.004, F.cuello - 0.005, 0.46, 64),
-      new THREE.MeshPhysicalMaterial({ color: lin(v.color_capsula || "#6d1630"), roughness: 0.3, metalness: 0.6, clearcoat: 0.6, clearcoatRoughness: 0.2 }));
-    capsula.position.y = F.alto - 0.22; capsula.renderOrder = 4; grp.add(capsula);
+    // Cápsula: tubo con tapa y borde redondeado, apenas más ancha que el pico
+    const rc = F.cuello + 0.006, tope = F.alto + 0.004, base = F.alto - 0.46;
+    const capsula = new THREE.Mesh(new THREE.LatheGeometry([[0, tope], [rc - 0.02, tope], [rc - 0.004, tope - 0.006], [rc, tope - 0.02], [rc, base + 0.01], [rc - 0.004, base]]
+      .map(p => new THREE.Vector2(p[0], p[1])), 96),
+      new THREE.MeshPhysicalMaterial({ color: lin(v.color_capsula || "#6d1630"), roughness: 0.32, metalness: 0.55, clearcoat: 0.7, clearcoatRoughness: 0.18, side: THREE.DoubleSide }));
+    capsula.renderOrder = 4; grp.add(capsula);
 
     // Sombra suave de apoyo
     if (!sombraTex){
