@@ -121,17 +121,24 @@
     vidrio.renderOrder = 3;
     grp.add(vidrio);
 
+    // Etiqueta y contraetiqueta: un tramo de cilindro con la foto, de frente (ángulo 0) o atrás (π)
+    const R = F.radio + 0.004;
+    const pegar = (fuente, alto, centro, angulo, maxArco) => {
+      const tex = new THREE.Texture(fuente); tex.needsUpdate = true;
+      tex.encoding = THREE.sRGBEncoding; tex.anisotropy = motor.r.capabilities.getMaxAnisotropy();
+      const aspecto = (fuente.naturalWidth || fuente.width) / (fuente.naturalHeight || fuente.height);
+      const arco = Math.min(maxArco, alto * aspecto / R);
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(R, R, alto, 96, 1, true, angulo - arco / 2, arco),
+        new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.6, metalness: 0, clearcoat: 0.15, clearcoatRoughness: 0.5, envMapIntensity: 0.7 }));
+      m.renderOrder = 4; m.position.y = centro; grp.add(m);
+      return arco;
+    };
     let fuente = v.foto_etiqueta ? await cargarImagen(v.foto_etiqueta) : null;
     if (!fuente) fuente = etiquetaDibujada(v);
-    const tex = new THREE.Texture(fuente); tex.needsUpdate = true;
-    tex.encoding = THREE.sRGBEncoding; tex.anisotropy = motor.r.capabilities.getMaxAnisotropy();
-    const R = F.radio + 0.004, alto = parseFloat(v.etiqueta_alto) || F.etiqueta.alto;
-    const aspecto = (fuente.naturalWidth || fuente.width) / (fuente.naturalHeight || fuente.height);
-    const arco = Math.min(2.8, alto * aspecto / R);
-    const etiqueta = new THREE.Mesh(new THREE.CylinderGeometry(R, R, alto, 96, 1, true, -arco / 2, arco),
-      new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.6, metalness: 0, clearcoat: 0.15, clearcoatRoughness: 0.5, envMapIntensity: 0.7 }));
-    etiqueta.renderOrder = 4;
-    etiqueta.position.y = parseFloat(v.etiqueta_centro) || F.etiqueta.centro; grp.add(etiqueta);
+    const centro = parseFloat(v.etiqueta_centro) || F.etiqueta.centro;
+    const arco = pegar(fuente, parseFloat(v.etiqueta_alto) || F.etiqueta.alto, centro, 0, 2.8);
+    const contra = v.foto_contra ? await cargarImagen(v.foto_contra) : null;
+    if (contra) pegar(contra, parseFloat(v.contra_alto) || F.etiqueta.alto * 0.85, parseFloat(v.contra_centro) || centro, Math.PI, 2 * Math.PI - arco - 0.12);
 
     const capsula = new THREE.Mesh(new THREE.CylinderGeometry(F.cuello + 0.004, F.cuello - 0.005, 0.46, 64),
       new THREE.MeshPhysicalMaterial({ color: lin(v.color_capsula || "#6d1630"), roughness: 0.3, metalness: 0.6, clearcoat: 0.6, clearcoatRoughness: 0.2 }));
@@ -154,6 +161,7 @@
     const pivote = new THREE.Group();
     grp.position.y = 1.53 - F.alto / 2;
     pivote.add(grp);
+    pivote.userData.etiquetaY = grp.position.y + centro;
     return pivote;
   }
 
@@ -167,6 +175,12 @@
   // ---------- API pública ----------
   let vista = null, mini = null, actual = null, raf = 0, token = 0;
   let rotY = 0, rotX = 0, velY = 0, arrastrando = false, lastX = 0, lastY = 0;
+  // Acercar: la cámara se acerca a la etiqueta y el arrastre vertical recorre la botella
+  let zoom = 1, zoomObj = 1, mirarY = 1.52, mirarObj = 1.52, etiquetaY = 1.52, alCambiarZoom = null;
+  function ponerZoom(z){
+    zoomObj = z; mirarObj = z > 1 ? etiquetaY : 1.52;
+    if (alCambiarZoom) alCambiarZoom(z > 1);
+  }
 
   function motorVista(){
     if (vista !== null) return vista;
@@ -178,11 +192,13 @@
     cv.addEventListener("pointermove", e => {
       if (!arrastrando) return;
       const dx = e.clientX - lastX, dy = e.clientY - lastY; lastX = e.clientX; lastY = e.clientY;
-      velY = dx * 0.012; rotY += velY;
-      rotX = Math.max(-0.35, Math.min(0.35, rotX + dy * 0.004));
+      velY = dx * 0.012 / Math.sqrt(zoom); rotY += velY;
+      if (zoomObj > 1) mirarObj = Math.max(0.3, Math.min(2.9, mirarObj + dy * 0.004));
+      else rotX = Math.max(-0.35, Math.min(0.35, rotX + dy * 0.004));
     });
     const soltar = () => { arrastrando = false; };
     cv.addEventListener("pointerup", soltar); cv.addEventListener("pointercancel", soltar);
+    cv.addEventListener("dblclick", () => ponerZoom(zoomObj > 1 ? 1 : 2.6));
     return vista;
   }
 
@@ -205,8 +221,11 @@
       if (yo !== token){ liberar(b); return true; }
       actual = b; m.scene.add(b);
       rotY = -0.35; rotX = 0; velY = 0;
+      etiquetaY = b.userData.etiquetaY; zoom = zoomObj = 1; mirarY = mirarObj = 1.52;
       const tick = () => {
-        if (!arrastrando){ rotY += velY; velY *= 0.94; if (Math.abs(velY) < 0.002 && !reduce) rotY += 0.005; rotX *= 0.94; }
+        if (!arrastrando){ rotY += velY; velY *= 0.94; if (Math.abs(velY) < 0.002 && !reduce && zoomObj === 1) rotY += 0.005; rotX *= 0.94; }
+        zoom += (zoomObj - zoom) * 0.15; mirarY += (mirarObj - mirarY) * 0.15;
+        m.camera.zoom = zoom; m.camera.position.y = mirarY + 0.08; m.camera.lookAt(0, mirarY, 0); m.camera.updateProjectionMatrix();
         b.rotation.y = rotY; b.rotation.x = rotX;
         m.r.render(m.scene, m.camera);
         raf = requestAnimationFrame(tick);
@@ -216,6 +235,10 @@
     },
 
     ajustar,
+
+    // Alterna entre la vista completa y la etiqueta de cerca; avisa los cambios a la página
+    alternarZoom(){ ponerZoom(zoomObj > 1 ? 1 : 2.6); },
+    alZoom(fn){ alCambiarZoom = fn; },
 
     parar(){
       token++;

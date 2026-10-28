@@ -27,6 +27,7 @@ Mientras no esté conectada la planilla de Google, las tablas son los archivos `
 | `bodega`, `bodega_ubicacion`, `bodega_desde`, `bodega_especialidad`, `bodega_historia`, `bodega_web`, `bodega_logo` | Información de la bodega. `bodega_logo` es la ruta a un PNG, ej. `img/bodegas/caelum.png` |
 | `foto_etiqueta` | Foto de frente de la etiqueta, ej. `img/etiquetas/nayara.jpg`. Si está vacía se dibuja una etiqueta simple |
 | `etiqueta_alto`, `etiqueta_centro` | Opcional: alto de la etiqueta y altura de su centro, en la escala de la botella (que mide 3,06). Vacío = valor estándar de la forma |
+| `foto_contra`, `contra_alto`, `contra_centro` | Opcional: foto de la contraetiqueta (va atrás de la botella 3D) y su tamaño, igual que la etiqueta |
 | `forma_botella` | `bordelesa` (hombros marcados), `borgoña` (hombros caídos) o `alsaciana` (alta y fina) |
 | `color_vidrio`, `color_vino`, `color_capsula` | Colores en formato `#rrggbb`: el vidrio (oscuro para tintos, casi blanco para blancos y rosados), el vino que se ve adentro y la cápsula |
 | `ejemplo` | `si` muestra el aviso "Contenido de ejemplo" |

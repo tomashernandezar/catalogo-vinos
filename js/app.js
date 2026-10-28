@@ -107,7 +107,8 @@
         <button class="back" id="volver">← ${esc(v.bodega || col.nombre)}</button>
         <span class="eyebrow">${esc(col.nombre)} · Fila ${esc(v.fila)}</span>
       </div>
-      <div class="stage" id="stage"><span class="hint eyebrow">Arrastrá para girar</span></div>
+      <div class="stage" id="stage"><span class="hint eyebrow">Arrastrá para girar</span>
+        <button class="zoom" id="zoom" type="button" aria-pressed="false">Acercar etiqueta</button></div>
       <div class="title">
         ${v.bodega ? `<span class="eyebrow">${esc(v.bodega)}</span>` : ""}
         <h1>${esc(v.nombre)}</h1>
@@ -134,9 +135,16 @@
     const stage = document.getElementById("stage");
     if (!Botella3D.disponible()){
       stage.querySelector(".hint").hidden = true;
+      document.getElementById("zoom").hidden = true;
       stage.insertAdjacentHTML("beforeend", `<div class="nogl">Este teléfono no puede mostrar la vista 3D.</div>`);
       return;
     }
+    const zb = document.getElementById("zoom");
+    Botella3D.alZoom(cerca => {
+      zb.textContent = cerca ? "Alejar" : "Acercar etiqueta"; zb.setAttribute("aria-pressed", cerca);
+      stage.querySelector(".hint").textContent = cerca ? "Arrastrá para recorrer" : "Arrastrá para girar";
+    });
+    zb.onclick = () => Botella3D.alternarZoom();
     Botella3D.mostrar(stage, v);
   }
 
