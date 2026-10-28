@@ -24,7 +24,7 @@ Mientras no esté conectada la planilla de Google, las tablas son los archivos `
 | `descripcion` | Párrafo corto de presentación |
 | `vista`, `nariz`, `boca` | Notas de cata |
 | `maridaje` | Comidas separadas por punto y coma: `Asado; Pastas; Quesos` |
-| `bodega`, `bodega_ubicacion`, `bodega_desde`, `bodega_especialidad`, `bodega_historia`, `bodega_web` | Información de la bodega |
+| `bodega`, `bodega_ubicacion`, `bodega_desde`, `bodega_especialidad`, `bodega_historia`, `bodega_web`, `bodega_logo` | Información de la bodega. `bodega_logo` es la ruta a un PNG, ej. `img/bodegas/caelum.png` |
 | `foto_etiqueta` | Foto de frente de la etiqueta, ej. `img/etiquetas/nayara.jpg`. Si está vacía se dibuja una etiqueta simple |
 | `etiqueta_alto`, `etiqueta_centro` | Opcional: alto de la etiqueta y altura de su centro, en la escala de la botella (que mide 3,06). Vacío = valor estándar de la forma |
 | `forma_botella` | `bordelesa` (hombros marcados), `borgoña` (hombros caídos) o `alsaciana` (alta y fina) |

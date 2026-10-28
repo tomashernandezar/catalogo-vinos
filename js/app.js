@@ -39,7 +39,7 @@
             return `<button class="bodega" data-bod="${esc(bid)}">
               <span class="strip">${ids.slice(0, 5).map(id => `<span class="thumb" data-thumb="${esc(id)}">${miniatura(id)}</span>`).join("")}</span>
               <span class="bodega-txt">
-                <h3>${esc(v.bodega || "Otros vinos")}</h3>
+                ${v.bodega_logo ? `<h3 class="logo-mini"><img src="${esc(v.bodega_logo)}" alt="${esc(v.bodega)}"></h3>` : `<h3>${esc(v.bodega || "Otros vinos")}</h3>`}
                 <span class="meta">${[v.bodega_ubicacion, `${ids.length} ${ids.length === 1 ? "vino" : "vinos"}`].filter(Boolean).map(esc).join(" · ")}</span>
               </span>
               <span class="go" aria-hidden="true">Ver →</span>
@@ -73,7 +73,7 @@
       </div>
       <header class="head">
         <span class="eyebrow">${ids.length} ${ids.length === 1 ? "vino" : "vinos"}</span>
-        <h1>${esc(v.bodega || "Otros vinos")}</h1>
+        ${v.bodega_logo ? `<h1 class="logo-bodega"><img src="${esc(v.bodega_logo)}" alt="${esc(v.bodega)}"></h1>` : `<h1>${esc(v.bodega || "Otros vinos")}</h1>`}
         ${datos.length ? `<div class="facts">${datos.map(d => `<span>${esc(d)}</span>`).join("")}</div>` : ""}
         ${v.bodega_historia ? `<details class="story"><summary>Conocé la bodega</summary><p>${esc(v.bodega_historia)}</p>
           ${/^https?:\/\//.test(v.bodega_web) ? `<a href="${esc(v.bodega_web)}" target="_blank" rel="noopener">Visitar la web de la bodega →</a>` : ""}</details>` : ""}
