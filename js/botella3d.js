@@ -3,11 +3,11 @@
   // Perfiles de botella: [radio, altura]. "cuerpo" es el tramo recto donde va la etiqueta.
   const FORMAS = {
     bordelesa: { perfil: [[0,0],[0.35,0],[0.383,0.035],[0.385,1.9],[0.37,2.04],[0.3,2.18],[0.19,2.34],[0.14,2.48],[0.132,2.62],[0.132,2.98],[0.145,3.0],[0.145,3.06],[0,3.06]],
-                 radio: 0.385, etiqueta: { centro: 1.22, alto: 1.0 }, alto: 3.06, cuello: 0.14 },
+                 radio: 0.385, etiqueta: { centro: 1.22, alto: 1.0 }, alto: 3.06, cuello: 0.14, nivel: 2.42 },
     "borgoña": { perfil: [[0,0],[0.39,0],[0.42,0.04],[0.42,1.55],[0.4,1.75],[0.33,2.05],[0.22,2.35],[0.15,2.55],[0.14,2.62],[0.14,2.98],[0.152,3.0],[0.152,3.06],[0,3.06]],
-                 radio: 0.42, etiqueta: { centro: 0.74, alto: 1.0 }, alto: 3.06, cuello: 0.152 },
+                 radio: 0.42, etiqueta: { centro: 0.74, alto: 1.0 }, alto: 3.06, cuello: 0.152, nivel: 2.5 },
     alsaciana: { perfil: [[0,0],[0.3,0],[0.33,0.03],[0.33,1.55],[0.3,1.85],[0.22,2.25],[0.15,2.6],[0.125,2.85],[0.125,3.25],[0.138,3.27],[0.138,3.33],[0,3.33]],
-                 radio: 0.33, etiqueta: { centro: 0.8, alto: 0.85 }, alto: 3.33, cuello: 0.138 }
+                 radio: 0.33, etiqueta: { centro: 0.8, alto: 0.85 }, alto: 3.33, cuello: 0.138, nivel: 2.72 }
   };
   FORMAS.borgona = FORMAS["borgoña"];
 
@@ -28,15 +28,26 @@
     camera.position.set(0, 1.6, 8.4);
     camera.lookAt(0, 1.52, 0);
 
-    // Entorno de estudio: fondo oscuro y dos "softbox" que dan los reflejos del vidrio
-    const c = document.createElement("canvas"); c.width = 512; c.height = 256;
+    // Entorno de estudio: fondo neutro con softboxes verticales (dan los brillos largos del vidrio)
+    const c = document.createElement("canvas"); c.width = 1024; c.height = 512;
     const g = c.getContext("2d");
-    const grd = g.createLinearGradient(0, 0, 0, 256); grd.addColorStop(0, "#5a5560"); grd.addColorStop(1, "#141216");
-    g.fillStyle = grd; g.fillRect(0, 0, 512, 256);
-    g.fillStyle = "#ffffff"; g.fillRect(96, 30, 34, 200); g.fillRect(352, 50, 14, 170);
-    g.fillStyle = "#cfc6d6"; g.fillRect(230, 0, 60, 24);
+    const grd = g.createLinearGradient(0, 0, 0, 512);
+    grd.addColorStop(0, "#6b6670"); grd.addColorStop(0.5, "#2a272d"); grd.addColorStop(1, "#121014");
+    g.fillStyle = grd; g.fillRect(0, 0, 1024, 512);
+    const caja = (x, y, w, h, a) => {
+      const k = g.createLinearGradient(x, 0, x + w, 0);
+      k.addColorStop(0, `rgba(255,255,255,0)`); k.addColorStop(0.25, `rgba(255,255,255,${a})`);
+      k.addColorStop(0.75, `rgba(255,255,255,${a})`); k.addColorStop(1, `rgba(255,255,255,0)`);
+      g.fillStyle = k; g.fillRect(x, y, w, h);
+    };
+    caja(180, 60, 90, 400, 1);      // softbox principal
+    caja(700, 90, 40, 330, 0.85);   // relleno del otro lado
+    caja(440, 40, 26, 420, 0.5);    // contraluz
+    caja(940, 70, 30, 360, 0.6);    // borde
+    g.fillStyle = "rgba(255,250,240,0.9)"; g.fillRect(380, 0, 260, 34); // luz cenital
     const t = new THREE.CanvasTexture(c); t.mapping = THREE.EquirectangularReflectionMapping; t.encoding = THREE.sRGBEncoding;
     scene.environment = new THREE.PMREMGenerator(r).fromEquirectangular(t).texture;
+    r.toneMappingExposure = 1.05;
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x3a2f3a, 0.55));
     const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(3, 5, 5); scene.add(key);
@@ -87,8 +98,28 @@
     const F = FORMAS[(v.forma_botella || "").toLowerCase()] || FORMAS.bordelesa;
     const grp = new THREE.Group();
     const perfil = F.perfil.map(p => new THREE.Vector2(p[0], p[1]));
-    grp.add(new THREE.Mesh(new THREE.LatheGeometry(perfil, 96),
-      new THREE.MeshPhysicalMaterial({ color: lin(v.color_vidrio || "#1d2a1c"), roughness: 0.06, metalness: 0.15, clearcoat: 1, clearcoatRoughness: 0.04, envMapIntensity: 1.3 })));
+    // Vino: un volumen interior, apenas más chico que el vidrio, hasta el nivel de llenado
+    const rEn = y => { for (let i = 1; i < F.perfil.length; i++){ const [r0, y0] = F.perfil[i - 1], [r1, y1] = F.perfil[i];
+      if (y >= y0 && y <= y1 && y1 > y0) return r0 + (r1 - r0) * (y - y0) / (y1 - y0); } return 0; };
+    const piso = 0.07, nivel = F.nivel, hueco = r => Math.max(0.02, r - 0.014);
+    const dentro = [new THREE.Vector2(0, piso), new THREE.Vector2(hueco(rEn(piso)), piso),
+      ...F.perfil.filter(p => p[1] > piso && p[1] < nivel && p[0] > 0).map(p => new THREE.Vector2(hueco(p[0]), p[1])),
+      new THREE.Vector2(hueco(rEn(nivel)), nivel), new THREE.Vector2(0, nivel)];
+    // Vino sin luz propia, como un líquido visto a través del vidrio: los claros dejan ver detrás, los tintos casi nada
+    const cVino = lin(v.color_vino || "#2a0610"), claro = cVino.getHSL({}).l > 0.1;
+    const vino = new THREE.Mesh(new THREE.LatheGeometry(dentro, 72),
+      new THREE.MeshBasicMaterial({ color: cVino, transparent: true, opacity: claro ? 0.6 : 0.95, depthWrite: false }));
+    vino.renderOrder = 1;
+    grp.add(vino);
+
+    // Vidrio: transparente pero con todos sus reflejos
+    // Vidrio oscuro (tintos, espumantes) deja pasar menos luz que el transparente
+    const cVidrio = lin(v.color_vidrio || "#2c3a26"), oscuro = cVidrio.getHSL({}).l < 0.2;
+    const vidrio = new THREE.Mesh(new THREE.LatheGeometry(perfil, 128),
+      new THREE.MeshPhysicalMaterial({ color: cVidrio, roughness: 0.04, metalness: 0, transmission: oscuro ? 0.45 : 0.9,
+        transparent: true, clearcoat: 1, clearcoatRoughness: 0.03, reflectivity: 0.6, envMapIntensity: 1.8, depthWrite: false }));
+    vidrio.renderOrder = 3;
+    grp.add(vidrio);
 
     let fuente = v.foto_etiqueta ? await cargarImagen(v.foto_etiqueta) : null;
     if (!fuente) fuente = etiquetaDibujada(v);
@@ -98,12 +129,13 @@
     const aspecto = (fuente.naturalWidth || fuente.width) / (fuente.naturalHeight || fuente.height);
     const arco = Math.min(2.8, alto * aspecto / R);
     const etiqueta = new THREE.Mesh(new THREE.CylinderGeometry(R, R, alto, 96, 1, true, -arco / 2, arco),
-      new THREE.MeshStandardMaterial({ map: tex, roughness: 0.82, metalness: 0 }));
+      new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.6, metalness: 0, clearcoat: 0.15, clearcoatRoughness: 0.5, envMapIntensity: 0.7 }));
+    etiqueta.renderOrder = 4;
     etiqueta.position.y = parseFloat(v.etiqueta_centro) || F.etiqueta.centro; grp.add(etiqueta);
 
     const capsula = new THREE.Mesh(new THREE.CylinderGeometry(F.cuello + 0.004, F.cuello - 0.005, 0.46, 64),
-      new THREE.MeshStandardMaterial({ color: lin(v.color_capsula || "#6d1630"), roughness: 0.35, metalness: 0.55 }));
-    capsula.position.y = F.alto - 0.22; grp.add(capsula);
+      new THREE.MeshPhysicalMaterial({ color: lin(v.color_capsula || "#6d1630"), roughness: 0.3, metalness: 0.6, clearcoat: 0.6, clearcoatRoughness: 0.2 }));
+    capsula.position.y = F.alto - 0.22; capsula.renderOrder = 4; grp.add(capsula);
 
     // Sombra suave de apoyo
     if (!sombraTex){
@@ -115,7 +147,7 @@
     }
     const sombra = new THREE.Mesh(new THREE.PlaneGeometry(F.radio * 4.2, F.radio * 4.2),
       new THREE.MeshBasicMaterial({ map: sombraTex, transparent: true, depthWrite: false }));
-    sombra.rotation.x = -Math.PI / 2; sombra.position.y = 0.002; sombra.userData.compartida = true;
+    sombra.rotation.x = -Math.PI / 2; sombra.position.y = 0.002; sombra.renderOrder = 0; sombra.userData.compartida = true;
     grp.add(sombra);
 
     // Centra la botella en cuadro, sin importar la forma

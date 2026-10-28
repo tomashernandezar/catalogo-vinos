@@ -28,7 +28,7 @@ Mientras no esté conectada la planilla de Google, las tablas son los archivos `
 | `foto_etiqueta` | Foto de frente de la etiqueta, ej. `img/etiquetas/nayara.jpg`. Si está vacía se dibuja una etiqueta simple |
 | `etiqueta_alto`, `etiqueta_centro` | Opcional: alto de la etiqueta y altura de su centro, en la escala de la botella (que mide 3,06). Vacío = valor estándar de la forma |
 | `forma_botella` | `bordelesa` (hombros marcados), `borgoña` (hombros caídos) o `alsaciana` (alta y fina) |
-| `color_vidrio`, `color_capsula` | Colores en formato `#rrggbb` |
+| `color_vidrio`, `color_vino`, `color_capsula` | Colores en formato `#rrggbb`: el vidrio (oscuro para tintos, casi blanco para blancos y rosados), el vino que se ve adentro y la cápsula |
 | `ejemplo` | `si` muestra el aviso "Contenido de ejemplo" |
 
 ### Fotos de etiquetas
