@@ -48,7 +48,7 @@ button{font:inherit;color:inherit}
 .foot{margin-top:28px;color:var(--muted);font-size:13px}
 
 /* ---------- Ficha ---------- */
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--accent)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#000}
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;
   padding-block:10px;margin-bottom:6px}
 .back{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px 7px 10px;cursor:pointer;font-size:15px}
@@ -97,10 +97,10 @@ img{max-width:100%}
 [hidden]{display:none!important}
 
 /* ---------- Banda de marca ---------- */
-.brand{background:var(--accent);color:var(--on-accent);
+.brand{background:#000;color:#fefefe;
   margin-left:calc(-1 * max(16px, env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px, env(safe-area-inset-right,0px)));
   padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));padding-block:14px}
 .brand-in{max-width:560px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand .logo{font-family:var(--f-display);font-weight:700;font-size:24px;letter-spacing:-.01em;line-height:1;display:flex;align-items:center}
-.brand .logo img{height:28px;width:auto;display:block}
+.brand .logo img{height:34px;width:auto;display:block}
 .brand .claim{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;opacity:.9;text-align:right}
