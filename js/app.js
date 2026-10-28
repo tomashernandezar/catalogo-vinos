@@ -30,7 +30,7 @@
           ${e.vinos.map(id => { const v = VINOS[id]; return `
             <button class="wine" data-id="${esc(id)}">
               <span class="thumb">${thumbs[id] ? `<img src="${thumbs[id]}" alt="">` : `<span class="ph"></span>`}</span>
-              <span class="wine-txt"><h3>${esc(v.nombre)}</h3><span class="meta">${esc(v.varietal)} ${esc(v.cosecha)} · ${esc(v.region)}</span></span>
+              <span class="wine-txt"><h3>${esc(v.nombre)} <em>${esc(v.varietal)}</em></h3><span class="meta">${[v.bodega, v.cosecha].filter(Boolean).map(esc).join(" · ")}</span></span>
               ${precio(v) || `<span class="go" aria-hidden="true">Ver →</span>`}
             </button>`; }).join("")}
         </section>`).join("") : `<p class="empty">Todavía no hay vinos cargados en esta columna.</p>`}

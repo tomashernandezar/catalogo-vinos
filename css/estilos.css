@@ -40,6 +40,7 @@ button{font:inherit;color:inherit}
 .thumb .ph{width:16px;height:80px;border-radius:5px 5px 3px 3px;background:var(--line)}
 .wine-txt{min-width:0}
 .wine-txt h3{font-size:22px;line-height:1.15}
+.wine-txt h3 em{font-style:normal;font-weight:400;color:var(--muted)}
 .wine-txt .meta{color:var(--muted);font-size:14px}
 .wine .go{font-family:var(--f-mono);font-size:13px;color:var(--accent)}
 .cols{display:flex;flex-wrap:wrap;gap:8px;margin-top:32px}
