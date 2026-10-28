@@ -5,6 +5,9 @@
   const thumbs = {};
   let COLUMNAS = [], VINOS = {};
 
+  document.getElementById("logo").innerHTML = CONFIG.logo ? `<img src="${esc(CONFIG.logo)}" alt="${esc(CONFIG.local)}">` : esc(CONFIG.local);
+  document.getElementById("claim").textContent = CONFIG.claim || "";
+
   try { ({ COLUMNAS, VINOS } = await cargarDatos()); }
   catch (e) { app.innerHTML = `<p class="empty">No pudimos cargar el catálogo. Probá de nuevo en un momento.</p>`; return; }
 
@@ -17,7 +20,7 @@
     const [p1, ...resto] = (col.titulo || "").split(" ");
     app.innerHTML = `
       <header class="head">
-        <span class="eyebrow">${esc(CONFIG.local)} · ${esc(col.nombre)}</span>
+        <span class="eyebrow">${esc(col.nombre)}</span>
         <h1>${esc(p1)} <em>${esc(resto.join(" "))}</em></h1>
         <p>Estos son los vinos de esta columna, de arriba hacia abajo. Tocá uno para verlo en 3D y conocer su bodega.</p>
       </header>

@@ -3,7 +3,13 @@
    ===================================================================== */
 window.CONFIG = {
   // Nombre que aparece arriba de cada página
-  local: "Vinoteca",
+  local: "DRINK'S",
+
+  // Logo para la banda roja de arriba (PNG blanco con fondo transparente). Vacío = nombre en texto.
+  logo: "",
+
+  // Frase de la marca, a la derecha del logo
+  claim: "Tu nuevo aliado",
 
   // true para mostrar el precio de cada vino
   mostrarPrecios: false,
