@@ -12,13 +12,14 @@
   FORMAS.borgona = FORMAS["borgoña"];
 
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let sombraTex = null;
   const lin = h => new THREE.Color(h || "#222").convertSRGBToLinear();
 
   function crearMotor(opts){
     let r;
     try { r = new THREE.WebGLRenderer(Object.assign({ antialias: true, alpha: true }, opts)); }
     catch (e) { return null; }
-    r.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    r.setPixelRatio(opts && opts.preserveDrawingBuffer ? 2 : Math.min(devicePixelRatio || 1, 3));
     r.outputEncoding = THREE.sRGBEncoding;
     r.toneMapping = THREE.ACESFilmicToneMapping;
     r.setClearColor(0x000000, 0);
@@ -104,6 +105,19 @@
       new THREE.MeshStandardMaterial({ color: lin(v.color_capsula || "#6d1630"), roughness: 0.35, metalness: 0.55 }));
     capsula.position.y = F.alto - 0.22; grp.add(capsula);
 
+    // Sombra suave de apoyo
+    if (!sombraTex){
+      const c = document.createElement("canvas"); c.width = c.height = 128;
+      const g = c.getContext("2d"), grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+      grd.addColorStop(0, "rgba(0,0,0,0.45)"); grd.addColorStop(0.45, "rgba(0,0,0,0.18)"); grd.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+      sombraTex = new THREE.CanvasTexture(c);
+    }
+    const sombra = new THREE.Mesh(new THREE.PlaneGeometry(F.radio * 4.2, F.radio * 4.2),
+      new THREE.MeshBasicMaterial({ map: sombraTex, transparent: true, depthWrite: false }));
+    sombra.rotation.x = -Math.PI / 2; sombra.position.y = 0.002; sombra.userData.compartida = true;
+    grp.add(sombra);
+
     // Centra la botella en cuadro, sin importar la forma
     const pivote = new THREE.Group();
     grp.position.y = 1.53 - F.alto / 2;
@@ -114,7 +128,7 @@
   function liberar(o){
     o.traverse(m => {
       if (m.geometry) m.geometry.dispose();
-      if (m.material){ if (m.material.map) m.material.map.dispose(); m.material.dispose(); }
+      if (m.material){ if (m.material.map && !m.userData.compartida) m.material.map.dispose(); m.material.dispose(); }
     });
   }
 
@@ -183,7 +197,7 @@
       if (!mini) { mini = false; return null; }
       const b = await crearBotella(mini, v); b.rotation.y = -0.25;
       mini.scene.add(b);
-      mini.r.setSize(128, 200, false); mini.camera.aspect = 128 / 200; mini.camera.updateProjectionMatrix();
+      mini.r.setSize(160, 250, false); mini.camera.aspect = 160 / 250; mini.camera.updateProjectionMatrix();
       mini.r.render(mini.scene, mini.camera);
       const url = mini.r.domElement.toDataURL("image/png");
       mini.scene.remove(b); liberar(b);

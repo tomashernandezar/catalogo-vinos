@@ -105,3 +105,39 @@ img{max-width:100%}
 .brand .logo{font-family:var(--f-display);font-weight:700;font-size:24px;letter-spacing:-.01em;line-height:1;display:flex;align-items:center}
 .brand .logo img{height:34px;width:auto;display:block}
 .brand .claim{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;opacity:.9;text-align:right}
+
+/* ---------- Bodegas y grilla de vinos ---------- */
+.bodega{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;width:100%;text-align:left;cursor:pointer;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 16px 12px 10px;transition:border-color .15s ease,transform .15s ease}
+.bodega:hover{border-color:var(--accent)}
+.bodega:active{transform:scale(.985)}
+.strip{display:flex;align-items:flex-end}
+.strip .thumb{width:30px;height:96px;margin-right:-4px}
+.strip .thumb img{width:46px;height:96px;max-width:none;object-fit:contain;margin-left:-8px}
+.strip .ph{width:12px;height:70px}
+.bodega-txt{min-width:0;display:grid;gap:2px}
+.bodega-txt h3{font-size:22px;line-height:1.15}
+.bodega-txt .meta{color:var(--muted);font-size:14px}
+.bodega .go{font-size:14px;font-weight:500;color:var(--accent)}
+.head .facts{margin-top:6px}
+.story{margin-top:8px}
+.story summary{cursor:pointer;color:var(--accent);font-weight:500;list-style:none}
+.story summary::-webkit-details-marker{display:none}
+.story summary::after{content:" ↓"}
+.story[open] summary::after{content:" ↑"}
+.story p{margin:10px 0;max-width:60ch}
+.story a{color:var(--accent);font-weight:500;text-decoration:none}
+.linea{display:grid;gap:12px;padding-top:26px}
+.linea h2{font-size:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.card{display:grid;justify-items:center;gap:8px;padding:14px 10px 12px;text-align:center;cursor:pointer;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;transition:border-color .15s ease,transform .15s ease}
+.card:hover{border-color:var(--accent)}
+.card:active{transform:scale(.97)}
+.card .thumb{width:96px;height:150px}
+.card .thumb img{width:96px;height:150px;object-fit:contain}
+.card .ph{width:22px;height:120px}
+.card-txt{display:grid;gap:2px;min-width:0}
+.card-txt strong{font-size:16px;line-height:1.25}
+.card-txt .meta{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.bodega,.card{transition:none}}
