@@ -26,6 +26,7 @@ Mientras no esté conectada la planilla de Google, las tablas son los archivos `
 | `maridaje` | Comidas separadas por punto y coma: `Asado; Pastas; Quesos` |
 | `bodega`, `bodega_ubicacion`, `bodega_desde`, `bodega_especialidad`, `bodega_historia`, `bodega_web` | Información de la bodega |
 | `foto_etiqueta` | Foto de frente de la etiqueta, ej. `img/etiquetas/nayara.jpg`. Si está vacía se dibuja una etiqueta simple |
+| `etiqueta_alto`, `etiqueta_centro` | Opcional: alto de la etiqueta y altura de su centro, en la escala de la botella (que mide 3,06). Vacío = valor estándar de la forma |
 | `forma_botella` | `bordelesa` (hombros marcados), `borgoña` (hombros caídos) o `alsaciana` (alta y fina) |
 | `color_vidrio`, `color_capsula` | Colores en formato `#rrggbb` |
 | `ejemplo` | `si` muestra el aviso "Contenido de ejemplo" |
@@ -39,6 +40,8 @@ Recortar la foto justo al borde de la etiqueta, de frente y con buena luz. Guard
 1. Crear una planilla con dos pestañas, `columnas` y `vinos`, e importar los CSV de `data/`.
 2. Archivo → Compartir → Publicar en la web → elegir cada pestaña → formato CSV → Publicar.
 3. Pegar las dos direcciones en `js/config.js` (`planillaColumnas` y `planillaVinos`).
+
+Para preparar una etiqueta desde una foto de la botella de frente: `herramientas/desenrollar_etiqueta.py`.
 
 ## Códigos QR
 

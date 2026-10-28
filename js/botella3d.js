@@ -93,12 +93,12 @@
     if (!fuente) fuente = etiquetaDibujada(v);
     const tex = new THREE.Texture(fuente); tex.needsUpdate = true;
     tex.encoding = THREE.sRGBEncoding; tex.anisotropy = motor.r.capabilities.getMaxAnisotropy();
-    const R = F.radio + 0.004, alto = F.etiqueta.alto;
+    const R = F.radio + 0.004, alto = parseFloat(v.etiqueta_alto) || F.etiqueta.alto;
     const aspecto = (fuente.naturalWidth || fuente.width) / (fuente.naturalHeight || fuente.height);
     const arco = Math.min(2.8, alto * aspecto / R);
     const etiqueta = new THREE.Mesh(new THREE.CylinderGeometry(R, R, alto, 96, 1, true, -arco / 2, arco),
       new THREE.MeshStandardMaterial({ map: tex, roughness: 0.82, metalness: 0 }));
-    etiqueta.position.y = F.etiqueta.centro; grp.add(etiqueta);
+    etiqueta.position.y = parseFloat(v.etiqueta_centro) || F.etiqueta.centro; grp.add(etiqueta);
 
     const capsula = new THREE.Mesh(new THREE.CylinderGeometry(F.cuello + 0.004, F.cuello - 0.005, 0.46, 64),
       new THREE.MeshStandardMaterial({ color: lin(v.color_capsula || "#6d1630"), roughness: 0.35, metalness: 0.55 }));
