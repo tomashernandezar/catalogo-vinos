@@ -44,6 +44,7 @@
     for (const v of vinos){
       if (!v.id || !si(v.en_stock)) continue;
       v.columna = v.columna.toLowerCase();
+      v.fila = v.fila || v.estante || "";
       v.maridaje = (v.maridaje || "").split(";").map(s => s.trim()).filter(Boolean);
       v.ejemplo = si(v.ejemplo);
       VINOS[v.id] = v;
@@ -54,12 +55,13 @@
       .map(c => {
         const id = c.id.toLowerCase();
         const mios = Object.values(VINOS).filter(v => v.columna === id);
-        const nums = [...new Set(mios.map(v => num(v.estante)))].sort((a, b) => a - b);
+        const nums = [...new Set(mios.map(v => num(v.fila)))].sort((a, b) => a - b);
         return {
           id, nombre: c.nombre, titulo: c.titulo,
-          estantes: nums.map(n => ({
+          filas: nums.map(n => ({
             n,
-            vinos: mios.filter(v => num(v.estante) === n).sort((a, b) => num(a.orden) - num(b.orden)).map(v => v.id)
+            bodegas: [...new Set(mios.filter(v => num(v.fila) === n).map(v => v.bodega).filter(Boolean))],
+            vinos: mios.filter(v => num(v.fila) === n).sort((a, b) => num(a.orden) - num(b.orden)).map(v => v.id)
           }))
         };
       });

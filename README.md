@@ -18,8 +18,8 @@ Mientras no esté conectada la planilla de Google, las tablas son los archivos `
 | `id` | Nombre corto sin espacios ni tildes, único (ej. `nayara-malbec`) |
 | `en_stock` | `si` para mostrarlo, `no` para ocultarlo sin borrarlo |
 | `columna` | `id` de la columna donde está (ej. `a`) |
-| `estante` | Número de estante, de arriba hacia abajo |
-| `orden` | Orden dentro del estante, de izquierda a derecha |
+| `fila` | Fila horizontal de la columna, de arriba hacia abajo (1 a 4). Conviene una bodega por fila |
+| `orden` | Orden dentro de la fila, de izquierda a derecha |
 | `nombre`, `varietal`, `cosecha`, `region`, `altitud`, `crianza`, `alcohol`, `servir_a`, `precio` | Ficha del vino (las vacías no se muestran) |
 | `descripcion` | Párrafo corto de presentación |
 | `vista`, `nariz`, `boca` | Notas de cata |

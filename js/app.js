@@ -22,15 +22,15 @@
       <header class="head">
         <span class="eyebrow">${esc(col.nombre)}</span>
         <h1>${esc(p1)} <em>${esc(resto.join(" "))}</em></h1>
-        <p>Estos son los vinos de esta columna, de arriba hacia abajo. Tocá uno para verlo en 3D y conocer su bodega.</p>
+        <p>Estos son los vinos de esta columna, fila por fila de arriba hacia abajo. Tocá uno para verlo en 3D y conocer su bodega.</p>
       </header>
-      ${col.estantes.length ? col.estantes.map(e => `
-        <section class="shelf" aria-label="Estante ${e.n}">
-          <div class="shelf-label eyebrow">Estante ${e.n}</div>
+      ${col.filas.length ? col.filas.map(e => `
+        <section class="shelf" aria-label="Fila ${e.n}">
+          <div class="shelf-label eyebrow">Fila ${e.n}${e.bodegas.length ? ` · ${e.bodegas.map(esc).join(" · ")}` : ""}</div>
           ${e.vinos.map(id => { const v = VINOS[id]; return `
             <button class="wine" data-id="${esc(id)}">
               <span class="thumb">${thumbs[id] ? `<img src="${thumbs[id]}" alt="">` : `<span class="ph"></span>`}</span>
-              <span class="wine-txt"><h3>${esc(v.nombre)} <em>${esc(v.varietal)}</em></h3><span class="meta">${[v.bodega, v.cosecha].filter(Boolean).map(esc).join(" · ")}</span></span>
+              <span class="wine-txt"><h3>${esc(v.nombre)} <em>${esc(v.varietal)}</em></h3><span class="meta">${[v.cosecha, v.crianza].filter(Boolean).map(esc).join(" · ")}</span></span>
               ${precio(v) || `<span class="go" aria-hidden="true">Ver →</span>`}
             </button>`; }).join("")}
         </section>`).join("") : `<p class="empty">Todavía no hay vinos cargados en esta columna.</p>`}
@@ -53,7 +53,7 @@
     app.innerHTML = `
       <div class="bar">
         <button class="back" id="volver">← ${esc(col.nombre)}</button>
-        <span class="eyebrow">Estante ${esc(v.estante)}</span>
+        <span class="eyebrow">Fila ${esc(v.fila)}</span>
       </div>
       <div class="stage" id="stage"><span class="hint eyebrow">Arrastrá para girar</span></div>
       <div class="title">
