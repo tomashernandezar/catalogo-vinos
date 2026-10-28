@@ -3,9 +3,9 @@
   // Perfiles de botella: [radio, altura]. "cuerpo" es el tramo recto donde va la etiqueta.
   const FORMAS = {
     bordelesa: { perfil: [[0,0],[0.35,0],[0.383,0.035],[0.385,1.9],[0.37,2.04],[0.3,2.18],[0.19,2.34],[0.14,2.48],[0.132,2.62],[0.132,2.98],[0.145,3.0],[0.145,3.06],[0,3.06]],
-                 radio: 0.385, etiqueta: { centro: 0.95, alto: 0.95 }, alto: 3.06, cuello: 0.14 },
+                 radio: 0.385, etiqueta: { centro: 1.22, alto: 1.0 }, alto: 3.06, cuello: 0.14 },
     "borgoña": { perfil: [[0,0],[0.39,0],[0.42,0.04],[0.42,1.55],[0.4,1.75],[0.33,2.05],[0.22,2.35],[0.15,2.55],[0.14,2.62],[0.14,2.98],[0.152,3.0],[0.152,3.06],[0,3.06]],
-                 radio: 0.42, etiqueta: { centro: 0.85, alto: 0.9 }, alto: 3.06, cuello: 0.152 },
+                 radio: 0.42, etiqueta: { centro: 0.74, alto: 1.0 }, alto: 3.06, cuello: 0.152 },
     alsaciana: { perfil: [[0,0],[0.3,0],[0.33,0.03],[0.33,1.55],[0.3,1.85],[0.22,2.25],[0.15,2.6],[0.125,2.85],[0.125,3.25],[0.138,3.27],[0.138,3.33],[0,3.33]],
                  radio: 0.33, etiqueta: { centro: 0.8, alto: 0.85 }, alto: 3.33, cuello: 0.138 }
   };
