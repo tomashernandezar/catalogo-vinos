@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>QR para imprimir</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=Figtree:wght@400;500&family=DM+Mono:wght@400&display=swap">
+<style>
+  :root{--ink:#231b24;--muted:#6a6070;--line:#d8d2db;--accent:#7a1f3d}
+  body{margin:0;background:#fff;color:var(--ink);font-family:"Figtree",system-ui,sans-serif;padding:24px 16px}
+  .top{max-width:900px;margin:0 auto 24px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  .top p{margin:0;color:var(--muted);max-width:60ch}
+  button{font:inherit;border:0;border-radius:999px;background:var(--ink);color:#fff;padding:10px 18px;cursor:pointer}
+  .grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+  .card{border:1px dashed var(--line);border-radius:12px;padding:24px;display:grid;gap:10px;justify-items:center;text-align:center;break-inside:avoid}
+  .eyebrow{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:30px;margin:0;line-height:1.1}
+  h2 em{color:var(--accent)}
+  .qr svg{width:200px;height:200px;display:block}
+  .cta{font-size:15px}
+  .url{font-family:"DM Mono",monospace;font-size:10px;color:var(--muted);word-break:break-all}
+  @media print{.top{display:none}body{padding:0}.card{border-color:#999}}
+</style>
+</head>
+<body>
+<div class="top">
+  <p>Un QR por columna de la estantería. Imprimí esta hoja, recortá cada tarjeta y pegala en su columna. Si agregás una columna en la planilla, aparece acá sola.</p>
+  <button onclick="print()">Imprimir</button>
+</div>
+<div class="grid" id="grid"></div>
+<script src="vendor/qrcode.js"></script>
+<script src="js/config.js"></script>
+<script src="js/datos.js"></script>
+<script>
+(async function(){
+  const { COLUMNAS } = await cargarDatos();
+  const base = location.href.replace(/qr\.html.*$/, "").replace(/#.*$/, "");
+  const esc = s => String(s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  document.getElementById("grid").innerHTML = COLUMNAS.map(c => {
+    const url = base + "#col-" + c.id;
+    const q = qrcode(0, "M"); q.addData(url); q.make();
+    const [p1, ...resto] = (c.titulo || "").split(" ");
+    return `<div class="card">
+      <span class="eyebrow">${esc(CONFIG.local)} · ${esc(c.nombre)}</span>
+      <h2>${esc(p1)} <em>${esc(resto.join(" "))}</em></h2>
+      <div class="qr">${q.createSvgTag({ cellSize: 4, margin: 2, scalable: true })}</div>
+      <span class="cta">Escaneá y conocé cada vino en 3D</span>
+      <span class="url">${esc(url)}</span>
+    </div>`;
+  }).join("");
+})();
+</script>
+</body>
+</html>
